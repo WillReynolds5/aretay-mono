@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase, type Course } from "@/lib/supabase";
+import type { Course } from "@/lib/supabase";
 
 const VISIBILITY_STYLES: Record<string, string> = {
   private:  "bg-white/5 text-[var(--muted)]",
@@ -15,140 +15,52 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // create form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [coverUrl, setCoverUrl] = useState("");
-  const [visibility, setVisibility] = useState<Course["visibility"]>("private");
-  const [creating, setCreating] = useState(false);
-  const [createMsg, setCreateMsg] = useState<{ text: string; ok: boolean } | null>(null);
-
   async function load() {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
-      .from("courses")
-      .select("id, title, description, cover_image_url, visibility, created_at, deleted_at")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false });
 
-    if (error) setError(error.message);
-    else setCourses(data as Course[]);
+    try {
+      const res = await fetch("/api/courses");
+      const data = await res.json();
+      if (!res.ok) setError(data.error ?? "Failed to load courses");
+      else setCourses(data.courses as Course[]);
+    } catch {
+      setError("Network error while loading courses.");
+    }
+
     setLoading(false);
   }
 
   useEffect(() => { load(); }, []);
 
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-    setCreating(true);
-    setCreateMsg(null);
-
-    const { error } = await supabase.from("courses").insert({
-      title: title.trim(),
-      description: description.trim() || null,
-      cover_image_url: coverUrl.trim() || null,
-      visibility,
-    });
-
-    setCreating(false);
-    if (error) {
-      setCreateMsg({ text: error.message, ok: false });
-    } else {
-      setCreateMsg({ text: "Course created.", ok: true });
-      setTitle(""); setDescription(""); setCoverUrl(""); setVisibility("private");
-      load();
-    }
-  }
-
   async function handleDelete(id: string) {
     if (!confirm("Delete this course?")) return;
-    await supabase.from("courses").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+    await fetch(`/api/courses/${id}`, { method: "DELETE" });
     load();
+  }
+
+  function lessonCount(course: Course) {
+    const videos = course.curriculum?.videos;
+    return Array.isArray(videos) ? videos.length : 0;
   }
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight mb-1">Aretay Admin</h1>
-          <p style={{ color: "var(--muted)" }} className="text-sm">Course management · Video studio</p>
-        </div>
-
-        {/* create form */}
-        <div className="rounded-xl border p-6 mb-8" style={{ background: "var(--panel)", borderColor: "var(--border)" }}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: "var(--muted)" }}>
+        <div className="flex items-start justify-between mb-10">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-1">Aretay Admin</h1>
+            <p style={{ color: "var(--muted)" }} className="text-sm">Course management · Video studio</p>
+          </div>
+          <Link
+            href="/courses/new"
+            className="px-5 py-2 rounded-md text-sm font-semibold"
+            style={{ background: "var(--accent)", color: "#0b0d10" }}
+          >
             New course
-          </h2>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-xs mb-1.5" style={{ color: "var(--muted)" }}>Title *</label>
-              <input
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="Intro to Swift"
-                required
-                className="w-full rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1"
-                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
-              />
-            </div>
-            <div>
-              <label className="block text-xs mb-1.5" style={{ color: "var(--muted)" }}>Description</label>
-              <textarea
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="A short overview…"
-                rows={2}
-                className="w-full rounded-md px-3 py-2 text-sm resize-none focus:outline-none"
-                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs mb-1.5" style={{ color: "var(--muted)" }}>Cover image URL</label>
-                <input
-                  value={coverUrl}
-                  onChange={e => setCoverUrl(e.target.value)}
-                  placeholder="https://…"
-                  className="w-full rounded-md px-3 py-2 text-sm focus:outline-none"
-                  style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
-                />
-              </div>
-              <div>
-                <label className="block text-xs mb-1.5" style={{ color: "var(--muted)" }}>Visibility</label>
-                <select
-                  value={visibility}
-                  onChange={e => setVisibility(e.target.value as Course["visibility"])}
-                  className="w-full rounded-md px-3 py-2 text-sm focus:outline-none"
-                  style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
-                >
-                  <option value="private">private</option>
-                  <option value="unlisted">unlisted</option>
-                  <option value="public">public</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                type="submit"
-                disabled={creating}
-                className="px-5 py-2 rounded-md text-sm font-semibold disabled:opacity-40"
-                style={{ background: "var(--accent)", color: "#0b0d10" }}
-              >
-                {creating ? "Adding…" : "Add course"}
-              </button>
-              {createMsg && (
-                <span className="text-sm" style={{ color: createMsg.ok ? "#6fcf97" : "#ff6b6b" }}>
-                  {createMsg.text}
-                </span>
-              )}
-            </div>
-          </form>
+          </Link>
         </div>
 
-        {/* course list */}
         <div className="rounded-xl border" style={{ background: "var(--panel)", borderColor: "var(--border)" }}>
           <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border)" }}>
             <h2 className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
@@ -176,7 +88,7 @@ export default function CoursesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                  {["Title", "Description", "Visibility", "Created", ""].map(h => (
+                  {["Title", "Description", "Lessons", "Visibility", "Created", ""].map(h => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
                       {h}
                     </th>
@@ -187,8 +99,11 @@ export default function CoursesPage() {
                 {courses.map(c => (
                   <tr key={c.id} className="border-b last:border-0 hover:bg-white/[0.02]" style={{ borderColor: "var(--border)" }}>
                     <td className="px-5 py-3 font-medium max-w-[200px] truncate">{c.title}</td>
-                    <td className="px-5 py-3 max-w-[240px] truncate" style={{ color: "var(--muted)" }}>
+                    <td className="px-5 py-3 max-w-[200px] truncate" style={{ color: "var(--muted)" }}>
                       {c.description ?? "—"}
+                    </td>
+                    <td className="px-5 py-3 text-xs" style={{ color: "var(--muted)" }}>
+                      {lessonCount(c) > 0 ? lessonCount(c) : "—"}
                     </td>
                     <td className="px-5 py-3">
                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${VISIBILITY_STYLES[c.visibility]}`}>

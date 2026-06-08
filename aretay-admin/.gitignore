@@ -20,6 +20,9 @@
 # production
 /build
 
+# whisper.cpp binary + models (downloaded on first transcribe)
+.whisper-cpp/
+
 # misc
 .DS_Store
 *.pem
