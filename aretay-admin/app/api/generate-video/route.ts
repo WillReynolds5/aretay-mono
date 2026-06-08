@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Replicate from "replicate";
-import { patchLesson } from "@/lib/course-curriculum";
-import { upsertConceptForLesson } from "@/lib/concepts";
+import { updateConceptForLesson } from "@/lib/concepts";
 import { getVideoUrl, lessonVideoKey, uploadVideo } from "@/lib/r2";
 
 export const maxDuration = 300;
@@ -62,8 +61,7 @@ export async function POST(req: NextRequest) {
     const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
     const r2Key = lessonVideoKey(courseId, lessonId);
     await uploadVideo(r2Key, videoBuffer);
-    await patchLesson(courseId, lessonId, { video_r2_key: r2Key });
-    await upsertConceptForLesson(courseId, lessonId, { video_r2_key: r2Key, captions: null });
+    await updateConceptForLesson(courseId, lessonId, { video_r2_key: r2Key, captions: null });
     const url = await getVideoUrl(r2Key);
 
     return NextResponse.json({ url, r2Key });

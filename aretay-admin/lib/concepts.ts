@@ -1,89 +1,89 @@
 import type { Caption } from "@remotion/captions";
-import type { CurriculumVideo } from "./curriculum";
 import { getCourseCurriculum } from "./course-curriculum";
 import { getSupabaseAdmin } from "./supabase-admin";
+
+export type ConceptData = {
+  video_r2_key: string | null;
+  captions: Caption[] | null;
+};
 
 export type ConceptPatch = {
   captions?: Caption[] | null;
   video_r2_key?: string | null;
 };
 
-async function getLesson(courseId: string, lessonId: number): Promise<CurriculumVideo | null> {
+export async function syncConceptsForCourse(courseId: string) {
   const curriculum = await getCourseCurriculum(courseId);
-  return curriculum?.videos?.find(v => v.id === lessonId) ?? null;
+  if (!curriculum?.videos?.length) return;
+
+  const { client } = getSupabaseAdmin();
+
+  const { data: existing, error: fetchError } = await client
+    .from("concepts")
+    .select("lesson_id")
+    .eq("course_id", courseId)
+    .is("deleted_at", null);
+
+  if (fetchError) throw new Error(fetchError.message);
+
+  const existingIds = new Set((existing ?? []).map(row => row.lesson_id));
+  const toInsert = curriculum.videos
+    .filter(lesson => !existingIds.has(lesson.id))
+    .map(lesson => ({
+      course_id: courseId,
+      lesson_id: lesson.id,
+      video_r2_key: null,
+      captions: null,
+      metadata: {},
+    }));
+
+  if (!toInsert.length) return;
+
+  const { error } = await client.from("concepts").insert(toInsert);
+  if (error) throw new Error(error.message);
 }
 
-function lessonMetadata(lesson: CurriculumVideo, videoR2Key?: string | null) {
-  return {
-    lesson_id: lesson.id,
-    title: lesson.title,
-    date: lesson.date,
-    era: lesson.era,
-    prompt: lesson.prompt,
-    narration: lesson.narration,
-    question: lesson.question,
-    video_r2_key: videoR2Key ?? lesson.video_r2_key ?? null,
-  };
-}
-
-export async function upsertConceptForLesson(
+export async function updateConceptForLesson(
   courseId: string,
   lessonId: number,
   patch: ConceptPatch,
 ) {
-  const lesson = await getLesson(courseId, lessonId);
-  if (!lesson) throw new Error(`Lesson ${lessonId} not found in curriculum`);
+  await syncConceptsForCourse(courseId);
 
   const { client } = getSupabaseAdmin();
+  const updates: ConceptPatch = {};
 
-  const { data: existing } = await client
+  if (patch.captions !== undefined) updates.captions = patch.captions;
+  if (patch.video_r2_key !== undefined) updates.video_r2_key = patch.video_r2_key;
+
+  const { error } = await client
     .from("concepts")
-    .select("id, captions, metadata")
+    .update(updates)
     .eq("course_id", courseId)
     .eq("lesson_id", lessonId)
-    .is("deleted_at", null)
-    .maybeSingle();
+    .is("deleted_at", null);
 
-  const videoR2Key =
-    patch.video_r2_key !== undefined
-      ? patch.video_r2_key
-      : (existing?.metadata as { video_r2_key?: string } | null)?.video_r2_key ?? lesson.video_r2_key ?? null;
-
-  const captions =
-    patch.captions !== undefined ? patch.captions : (existing?.captions as Caption[] | null) ?? null;
-
-  const row = {
-    course_id: courseId,
-    lesson_id: lessonId,
-    captions,
-    metadata: lessonMetadata(lesson, videoR2Key),
-  };
-
-  if (existing) {
-    const { error } = await client.from("concepts").update(row).eq("id", existing.id);
-    if (error) throw new Error(error.message);
-  } else {
-    const { error } = await client.from("concepts").insert(row);
-    if (error) throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 }
 
-export async function getConceptCaptionsMap(courseId: string): Promise<Map<number, Caption[]>> {
+export async function getConceptDataMap(courseId: string): Promise<Map<number, ConceptData>> {
   const { client } = getSupabaseAdmin();
   const { data, error } = await client
     .from("concepts")
-    .select("lesson_id, captions")
+    .select("lesson_id, video_r2_key, captions")
     .eq("course_id", courseId)
     .is("deleted_at", null)
     .not("lesson_id", "is", null);
 
   if (error) throw new Error(error.message);
 
-  const map = new Map<number, Caption[]>();
+  const map = new Map<number, ConceptData>();
   for (const row of data ?? []) {
-    if (row.lesson_id && Array.isArray(row.captions)) {
-      map.set(row.lesson_id, row.captions as Caption[]);
-    }
+    if (row.lesson_id == null) continue;
+    map.set(row.lesson_id, {
+      video_r2_key: row.video_r2_key ?? null,
+      captions: Array.isArray(row.captions) ? (row.captions as Caption[]) : null,
+    });
   }
   return map;
 }

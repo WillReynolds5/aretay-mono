@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getConceptDataMap, syncConceptsForCourse } from "@/lib/concepts";
 import { enrichCurriculumVideos } from "@/lib/course-curriculum";
-import { getConceptCaptionsMap } from "@/lib/concepts";
 import type { Curriculum } from "@/lib/curriculum";
 import { getVideoUrl, lessonVideoKey, objectExists } from "@/lib/r2";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -24,20 +24,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     const curriculum = data.curriculum as Curriculum | null;
     if (curriculum?.videos?.length) {
-      const captionsMap = await getConceptCaptionsMap(id);
-      const enriched = await enrichCurriculumVideos(
+      await syncConceptsForCourse(id);
+      const conceptsMap = await getConceptDataMap(id);
+      const videos = await enrichCurriculumVideos(
         id,
         curriculum.videos,
+        conceptsMap,
         key => getVideoUrl(key),
         async lessonId => {
           const key = lessonVideoKey(id, lessonId);
           return (await objectExists(key)) ? key : null;
         },
       );
-      const videos = enriched.map(lesson => ({
-        ...lesson,
-        captions: captionsMap.get(lesson.id) ?? lesson.captions ?? null,
-      }));
       data.curriculum = { ...curriculum, videos };
     }
 

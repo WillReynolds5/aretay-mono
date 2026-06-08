@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { upsertConceptForLesson } from "@/lib/concepts";
+import { updateConceptForLesson } from "@/lib/concepts";
 import { transcribeFromUrl } from "@/lib/whisper";
 
 export const maxDuration = 600;
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const captions = await transcribeFromUrl(videoUrl);
 
     if (courseId && lessonId !== null) {
-      await upsertConceptForLesson(courseId, lessonId, { captions });
+      await updateConceptForLesson(courseId, lessonId, { captions });
     }
 
     return NextResponse.json({ captions });
