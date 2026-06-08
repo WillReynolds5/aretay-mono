@@ -12,6 +12,7 @@
       --text: #e8edf2;
       --muted: #8a95a3;
       --accent: #6ea8ff;
+      --success: #6fcf97;
     }
     * { box-sizing: border-box; }
     body {
@@ -22,7 +23,7 @@
       line-height: 1.5;
     }
     .container {
-      max-width: 820px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 64px 24px;
     }
@@ -36,6 +37,8 @@
       font-size: 1.05rem;
       margin: 0 0 40px;
     }
+
+    /* ── tabs ── */
     .tabs {
       display: flex;
       gap: 4px;
@@ -64,88 +67,243 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-top: none;
-      padding: 28px;
+      padding: 32px;
       border-radius: 0 0 8px 8px;
     }
     .panel.active { display: block; }
-    .panel h2 {
-      margin: 0 0 6px;
-      font-size: 1.25rem;
-    }
+
+    /* ── panel typography ── */
+    .panel h2 { margin: 0 0 4px; font-size: 1.3rem; }
     .panel .repo-link {
       display: inline-block;
       color: var(--accent);
       text-decoration: none;
-      font-size: 0.9rem;
-      margin-bottom: 18px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
     }
     .panel .repo-link:hover { text-decoration: underline; }
-    .panel p { color: var(--muted); }
+    .panel > p { color: var(--muted); margin: 0 0 24px; }
     .panel h3 {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin: 28px 0 10px;
+    }
+    .panel h3:first-of-type { margin-top: 0; }
+
+    /* ── pill badges ── */
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .pill {
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ── command blocks ── */
+    .cmd-list { display: flex; flex-direction: column; gap: 8px; }
+    .cmd {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .cmd code {
+      font-family: "SF Mono", ui-monospace, monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .cmd span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* ── table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead th {
+      text-align: left;
+      font-size: 0.74rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--muted);
-      margin: 24px 0 8px;
+      padding: 0 12px 8px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .placeholder {
-      color: var(--muted);
-      font-style: italic;
-      opacity: 0.6;
+    td {
+      padding: 10px 12px 10px 0;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
     }
+    tbody tr:last-child td { border-bottom: none; }
+    td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; }
+    td:not(:first-child) { color: var(--muted); }
+    td code {
+      font-family: "SF Mono", ui-monospace, monospace;
+      font-size: 0.78rem;
+      background: var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .placeholder { color: var(--muted); font-style: italic; opacity: 0.55; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Aretay</h1>
-      <p>An iOS app backed by a Supabase service — details coming soon.</p>
+      <p>iOS learning app · Supabase backend · Remotion video studio</p>
     </header>
 
     <nav class="tabs" role="tablist">
-      <button class="tab active" data-tab="ios" role="tab">aretay-ios</button>
-      <button class="tab" data-tab="backend" role="tab">aretay-backend</button>
+      <button class="tab active" data-tab="ios"     role="tab">aretay-ios</button>
+      <button class="tab"        data-tab="backend" role="tab">aretay-backend</button>
+      <button class="tab"        data-tab="admin"   role="tab">aretay-admin</button>
     </nav>
 
+    <!-- ── iOS ───────────────────────────────────────────────────── -->
     <section class="panel active" id="ios" role="tabpanel">
       <h2>aretay-ios</h2>
       <a class="repo-link" href="https://github.com/WillReynolds5/aretay-ios">github.com/WillReynolds5/aretay-ios →</a>
-      <p>The iOS front end for Aretay, built with SwiftUI and SwiftData. Targets iOS 17+ and uses Swift 6 with strict concurrency.</p>
+      <p>SwiftUI iOS app. Targets iOS 17+ with Swift 6 strict concurrency. Talks to the Supabase backend for auth, data, and storage.</p>
 
       <h3>Stack</h3>
-      <p>SwiftUI · SwiftData · Swift 6 · XcodeGen</p>
+      <div class="pills">
+        <span class="pill">SwiftUI</span>
+        <span class="pill">SwiftData</span>
+        <span class="pill">Swift 6</span>
+        <span class="pill">XcodeGen</span>
+        <span class="pill">Supabase Swift SDK</span>
+      </div>
 
-      <h3>What it does</h3>
-      <p class="placeholder">TBD</p>
+      <h3>Run locally</h3>
+      <div class="cmd-list">
+        <div class="cmd"><code>brew install xcodegen</code><span>one-time prerequisite</span></div>
+        <div class="cmd"><code>xcodegen generate</code><span>generates Aretay.xcodeproj from project.yml</span></div>
+        <div class="cmd"><code>open Aretay.xcodeproj</code><span>then press ⌘R</span></div>
+      </div>
+
+      <h3>Config</h3>
+      <p style="margin-bottom:8px">Copy <code>Config/Secrets.example.xcconfig</code> → <code>Config/Secrets.xcconfig</code> and fill in:</p>
+      <div class="cmd-list">
+        <div class="cmd"><code>SUPABASE_URL</code><span>local: <code>http:/$()/127.0.0.1:54321</code> · prod: from Supabase dashboard</span></div>
+        <div class="cmd"><code>SUPABASE_ANON_KEY</code><span>from <code>./run-backend.sh keys</code> or Supabase dashboard</span></div>
+      </div>
 
       <h3>Screens</h3>
       <p class="placeholder">TBD</p>
     </section>
 
+    <!-- ── backend ───────────────────────────────────────────────── -->
     <section class="panel" id="backend" role="tabpanel">
       <h2>aretay-backend</h2>
       <a class="repo-link" href="https://github.com/WillReynolds5/aretay-backend">github.com/WillReynolds5/aretay-backend →</a>
-      <p>The Supabase-powered backend for Aretay. Provides the database, auth, and any server-side logic the iOS app talks to.</p>
+      <p>Supabase project providing Postgres, Auth, Storage, and Edge Functions. Migrations live in <code>supabase/migrations/</code> and are deployed to prod automatically on push to <code>main</code> via GitHub Actions.</p>
 
       <h3>Stack</h3>
-      <p>Supabase (Postgres · Auth · Storage · Edge Functions)</p>
+      <div class="pills">
+        <span class="pill">Supabase</span>
+        <span class="pill">Postgres 17</span>
+        <span class="pill">Row Level Security</span>
+        <span class="pill">Supabase Auth</span>
+        <span class="pill">Supabase Storage</span>
+      </div>
+
+      <h3>Run locally</h3>
+      <div class="cmd-list">
+        <div class="cmd"><code>./run-backend.sh start</code><span>boots local Supabase stack in Docker</span></div>
+        <div class="cmd"><code>./run-backend.sh keys</code><span>prints SUPABASE_URL + ANON_KEY for Secrets.xcconfig</span></div>
+        <div class="cmd"><code>./run-backend.sh new &lt;name&gt;</code><span>creates a new timestamped migration file</span></div>
+        <div class="cmd"><code>./run-backend.sh push</code><span>pushes local migrations to linked prod project</span></div>
+        <div class="cmd"><code>./run-backend.sh stop</code><span>shuts down local stack</span></div>
+      </div>
+
+      <h3>Local service URLs</h3>
+      <table>
+        <thead><tr><th>Service</th><th>URL</th></tr></thead>
+        <tbody>
+          <tr><td>API</td><td><code>http://127.0.0.1:54321</code></td></tr>
+          <tr><td>Postgres</td><td><code>postgresql://postgres:postgres@127.0.0.1:54322/postgres</code></td></tr>
+          <tr><td>Studio</td><td><code>http://127.0.0.1:54323</code></td></tr>
+          <tr><td>Inbucket (email)</td><td><code>http://127.0.0.1:54324</code></td></tr>
+        </tbody>
+      </table>
 
       <h3>Data model</h3>
-      <p class="placeholder">TBD</p>
+      <table>
+        <thead><tr><th>Table</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>courses</td><td>Top-level course records. Owner-scoped RLS. Soft-deleted via <code>deleted_at</code>.</td></tr>
+          <tr><td>concepts</td><td>Individual concepts within a course. Inherits course owner via FK.</td></tr>
+        </tbody>
+      </table>
 
-      <h3>API / endpoints</h3>
-      <p class="placeholder">TBD</p>
+      <h3>CI / deployment</h3>
+      <p>Merging to <code>main</code> triggers <code>.github/workflows/deploy-migrations.yml</code>, which runs <code>supabase db push</code> against prod (<code>rtrkltfoaxewosbzrlep</code>).</p>
+    </section>
+
+    <!-- ── admin ─────────────────────────────────────────────────── -->
+    <section class="panel" id="admin" role="tabpanel">
+      <h2>aretay-admin</h2>
+      <p>Local-only Next.js admin console for seeding courses and producing course videos with Remotion. Not deployed — run it on your machine.</p>
+
+      <h3>Stack</h3>
+      <div class="pills">
+        <span class="pill">Next.js 16 (App Router)</span>
+        <span class="pill">React 19</span>
+        <span class="pill">Tailwind CSS 4</span>
+        <span class="pill">Remotion 4</span>
+        <span class="pill">Supabase JS</span>
+      </div>
+
+      <h3>Run locally</h3>
+      <div class="cmd-list">
+        <div class="cmd"><code>./run-admin.sh</code><span>installs deps if needed, starts Next.js at <code>localhost:3000</code></span></div>
+        <div class="cmd"><code>npm run studio --prefix aretay-admin</code><span>opens Remotion Studio at <code>localhost:3001</code></span></div>
+      </div>
+
+      <h3>Pages</h3>
+      <table>
+        <thead><tr><th>Route</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>/</code></td><td>Course list — create, view, and delete courses in Supabase.</td></tr>
+          <tr><td><code>/courses/[id]</code></td><td>Video studio — Remotion Player preview + CLI render command for the selected course.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Video compositions</h3>
+      <table>
+        <thead><tr><th>Composition</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>CourseVideo</code></td><td>Animated title card + outro. Props: <code>title</code>, <code>description</code>, <code>coverImageUrl</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Render a video</h3>
+      <div class="cmd-list">
+        <div class="cmd">
+          <code>npx remotion render remotion/index.ts CourseVideo out/&lt;id&gt;.mp4 --props='…'</code>
+          <span>renders to MP4 locally — command shown on each course's studio page</span>
+        </div>
+      </div>
     </section>
   </div>
 
   <script>
-    const tabs = document.querySelectorAll(".tab");
+    const tabs   = document.querySelectorAll(".tab");
     const panels = document.querySelectorAll(".panel");
-    tabs.forEach((tab) => {
+    tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         const target = tab.dataset.tab;
-        tabs.forEach((t) => t.classList.toggle("active", t === tab));
-        panels.forEach((p) => p.classList.toggle("active", p.id === target));
+        tabs.forEach(t   => t.classList.toggle("active", t === tab));
+        panels.forEach(p => p.classList.toggle("active", p.id === target));
       });
     });
   </script>
