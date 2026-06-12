@@ -30,11 +30,19 @@ function getClient() {
   });
 }
 
-export function lessonVideoKey(courseId: string, lessonId: number) {
-  return `${R2_PREFIX}/courses/${courseId}/lessons/${lessonId}.mp4`;
+export function segmentVideoKey(courseId: string, segmentKey: string) {
+  return `${R2_PREFIX}/courses/${courseId}/segments/${segmentKey}.mp4`;
 }
 
-export async function uploadVideo(key: string, body: Buffer) {
+export function segmentAudioKey(courseId: string, segmentKey: string) {
+  return `${R2_PREFIX}/courses/${courseId}/segments/${segmentKey}.wav`;
+}
+
+export function segmentBoardKey(courseId: string, segmentKey: string) {
+  return `${R2_PREFIX}/courses/${courseId}/segments/${segmentKey}-board.png`;
+}
+
+export async function uploadObject(key: string, body: Buffer, contentType: string) {
   const { bucket } = getR2Config();
   const client = getClient();
 
@@ -43,9 +51,13 @@ export async function uploadVideo(key: string, body: Buffer) {
       Bucket: bucket,
       Key: key,
       Body: body,
-      ContentType: "video/mp4",
+      ContentType: contentType,
     }),
   );
+}
+
+export async function uploadVideo(key: string, body: Buffer) {
+  await uploadObject(key, body, "video/mp4");
 }
 
 export async function objectExists(key: string): Promise<boolean> {

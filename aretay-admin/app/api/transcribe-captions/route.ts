@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateConceptForLesson } from "@/lib/concepts";
+import { updateCardForSegment } from "@/lib/cards";
 import { transcribeFromUrl } from "@/lib/whisper";
 
 export const maxDuration = 600;
@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
   const courseId = typeof body.courseId === "string" ? body.courseId.trim() : "";
-  const lessonId = typeof body.lessonId === "number" ? body.lessonId : null;
+  const segmentKey = typeof body.segmentKey === "string" ? body.segmentKey.trim() : "";
 
   if (!videoUrl) {
     return NextResponse.json({ error: "videoUrl is required" }, { status: 400 });
@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
   try {
     const captions = await transcribeFromUrl(videoUrl);
 
-    if (courseId && lessonId !== null) {
-      await updateConceptForLesson(courseId, lessonId, { captions });
+    if (courseId && segmentKey) {
+      await updateCardForSegment(courseId, segmentKey, { captions });
     }
 
     return NextResponse.json({ captions });

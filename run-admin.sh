@@ -19,5 +19,5 @@ if [[ ! -d "${ADMIN_DIR}/node_modules" ]]; then
   npm install --prefix "${ADMIN_DIR}"
 fi
 
-echo "Starting Aretay Admin at http://localhost:3000"
-npm run dev --prefix "${ADMIN_DIR}"
+echo "Starting Aretay Admin at http://localhost:3001"
+npm run dev --prefix "${ADMIN_DIR}" -- -p 3001

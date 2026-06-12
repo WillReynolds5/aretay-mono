@@ -33,6 +33,16 @@ export default function CoursesPage() {
 
   useEffect(() => { load(); }, []);
 
+  async function handleToggleLive(id: string, isLive: boolean) {
+    setCourses(prev => prev.map(c => (c.id === id ? { ...c, is_live: isLive } : c)));
+    const res = await fetch(`/api/courses/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_live: isLive }),
+    });
+    if (!res.ok) load(); // revert the optimistic flip
+  }
+
   async function handleDelete(id: string) {
     if (!confirm("Delete this course?")) return;
     await fetch(`/api/courses/${id}`, { method: "DELETE" });
@@ -40,13 +50,13 @@ export default function CoursesPage() {
   }
 
   function lessonCount(course: Course) {
-    const videos = course.curriculum?.videos;
-    return Array.isArray(videos) ? videos.length : 0;
+    const lessons = course.curriculum?.lessons;
+    return Array.isArray(lessons) ? lessons.length : 0;
   }
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex items-start justify-between mb-10">
           <div>
             <h1 className="text-3xl font-bold tracking-tight mb-1">Aretay Admin</h1>
@@ -85,10 +95,11 @@ export default function CoursesPage() {
             <p className="text-center py-10 text-sm italic" style={{ color: "var(--muted)" }}>No courses yet.</p>
           )}
           {!loading && !error && courses.length > 0 && (
+            <div className="overflow-x-auto rounded-b-xl">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                  {["Title", "Description", "Lessons", "Visibility", "Created", ""].map(h => (
+                  {["Title", "Description", "Lessons", "Visibility", "Live", "Created", ""].map(h => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>
                       {h}
                     </th>
@@ -110,21 +121,30 @@ export default function CoursesPage() {
                         {c.visibility}
                       </span>
                     </td>
+                    <td className="px-5 py-3">
+                      <input
+                        type="checkbox"
+                        checked={c.is_live}
+                        onChange={e => handleToggleLive(c.id, e.target.checked)}
+                        className="h-4 w-4 cursor-pointer accent-[var(--accent)]"
+                        title={c.is_live ? "Live in the iOS app" : "Hidden from the iOS app"}
+                      />
+                    </td>
                     <td className="px-5 py-3 text-xs" style={{ color: "var(--muted)" }}>
                       {new Date(c.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/courses/${c.id}`}
-                          className="text-xs px-3 py-1.5 rounded-md border font-medium"
+                          className="text-xs px-3 py-1.5 rounded-md border font-medium whitespace-nowrap"
                           style={{ color: "var(--accent)", borderColor: "var(--border)" }}
                         >
                           Studio →
                         </Link>
                         <button
                           onClick={() => handleDelete(c.id)}
-                          className="text-xs px-3 py-1.5 rounded-md border"
+                          className="text-xs px-3 py-1.5 rounded-md border whitespace-nowrap"
                           style={{ color: "#ff6b6b", borderColor: "var(--border)" }}
                         >
                           Delete
@@ -135,6 +155,7 @@ export default function CoursesPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

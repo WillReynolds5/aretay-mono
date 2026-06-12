@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { syncConceptsForCourse } from "@/lib/concepts";
+import { syncCardsForCourse } from "@/lib/cards";
 import type { Curriculum } from "@/lib/curriculum";
 import { sanitizeCurriculum } from "@/lib/curriculum";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 const COURSE_COLUMNS =
-  "id, title, description, cover_image_url, visibility, curriculum, created_at, deleted_at";
+  "id, title, description, cover_image_url, visibility, is_live, tags, curriculum, created_at, deleted_at";
 
 export async function GET() {
   try {
@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
         ? sanitizeCurriculum(body.curriculum as Curriculum)
         : null;
 
+    const description =
+      curriculum?.description ??
+      (typeof body.description === "string" ? body.description.trim() || null : null);
+
     const visibility =
       body.visibility === "private" || body.visibility === "unlisted" || body.visibility === "public"
         ? body.visibility
@@ -48,10 +52,11 @@ export async function POST(req: NextRequest) {
       .from("courses")
       .insert({
         owner_id: ownerId,
-        title,
-        description: typeof body.description === "string" ? body.description.trim() || null : null,
+        title: curriculum?.title ?? title,
+        description,
         cover_image_url: typeof body.cover_image_url === "string" ? body.cover_image_url.trim() || null : null,
         visibility,
+        tags: curriculum?.tags ?? [],
         curriculum,
       })
       .select("id")
@@ -60,7 +65,11 @@ export async function POST(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     if (curriculum) {
-      await syncConceptsForCourse(data.id);
+      try {
+        await syncCardsForCourse(data.id);
+      } catch (syncErr) {
+        console.error("syncCardsForCourse failed:", syncErr);
+      }
     }
 
     return NextResponse.json({ id: data.id }, { status: 201 });

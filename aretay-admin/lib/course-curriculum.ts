@@ -1,7 +1,8 @@
 import type { Caption } from "@remotion/captions";
-import type { ConceptData } from "./concepts";
-import { updateConceptForLesson } from "./concepts";
-import type { Curriculum, CurriculumVideo } from "./curriculum";
+import type { CardData } from "./cards";
+import { updateCardForSegment } from "./cards";
+import type { Curriculum, RenderableScript } from "./curriculum";
+import { flattenScripts } from "./curriculum";
 import { getSupabaseAdmin } from "./supabase-admin";
 
 export async function getCourseCurriculum(courseId: string): Promise<Curriculum | null> {
@@ -17,35 +18,56 @@ export async function getCourseCurriculum(courseId: string): Promise<Curriculum 
   return (data?.curriculum as Curriculum | null) ?? null;
 }
 
-export type EnrichedCurriculumVideo = CurriculumVideo & {
+export type EnrichedScript = RenderableScript & {
   video_url: string | null;
   captions: Caption[] | null;
+  audio_url: string | null;
+  audio_duration: number | null;
+  board_url: string | null;
+  final_script: string | null;
+  board_prompt: string | null;
+  video_prompt: string | null;
+  costs: import("./production").ProductionCosts | null;
 };
 
-export async function enrichCurriculumVideos(
+export async function enrichScripts(
   courseId: string,
-  videos: CurriculumVideo[],
-  conceptsMap: Map<number, ConceptData>,
+  curriculum: Curriculum,
+  cardsMap: Map<string, CardData>,
   resolveUrl: (key: string) => Promise<string>,
-  discoverKey: (lessonId: number) => Promise<string | null>,
-): Promise<EnrichedCurriculumVideo[]> {
+  discoverKey: (segmentKey: string) => Promise<string | null>,
+): Promise<EnrichedScript[]> {
+  const scripts = flattenScripts(curriculum);
+
   return Promise.all(
-    videos.map(async lesson => {
-      const concept = conceptsMap.get(lesson.id);
-      let key = concept?.video_r2_key ?? null;
+    scripts.map(async script => {
+      const card = cardsMap.get(script.segmentKey);
+      let key = card?.video_r2_key ?? null;
 
       if (!key) {
-        const discovered = await discoverKey(lesson.id);
+        const discovered = await discoverKey(script.segmentKey);
         if (discovered) {
           key = discovered;
-          await updateConceptForLesson(courseId, lesson.id, { video_r2_key: discovered });
+          await updateCardForSegment(courseId, script.segmentKey, { video_r2_key: discovered });
         }
       }
 
+      const production = card?.production ?? {};
+
       return {
-        ...lesson,
+        ...script,
         video_url: key ? await resolveUrl(key) : null,
-        captions: concept?.captions ?? null,
+        captions: card?.captions ?? null,
+        audio_url: production.audio_r2_key ? await resolveUrl(production.audio_r2_key) : null,
+        audio_duration: production.audio_duration ?? null,
+        board_url: production.board_r2_key ? await resolveUrl(production.board_r2_key) : null,
+        final_script:
+          production.final_script && production.final_script !== script.script
+            ? production.final_script
+            : null,
+        board_prompt: production.board_prompt ?? null,
+        video_prompt: production.video_prompt ?? null,
+        costs: production.costs ?? null,
       };
     }),
   );

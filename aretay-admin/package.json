@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "studio": "remotion studio remotion/index.ts",
-    "render": "remotion render remotion/index.ts CourseVideo"
+    "render": "remotion render remotion/index.ts CourseVideo",
+    "experiment": "node --env-file=.env.local scripts/flag-experiment.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1063.0",
