@@ -301,7 +301,7 @@
           <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>Supabase API URL (local or prod)</td></tr>
           <tr><td><code>SUPABASE_SECRET_KEY</code></td><td>Service role key — bypasses RLS for admin writes</td></tr>
           <tr><td><code>SUPABASE_ADMIN_OWNER_ID</code></td><td>UUID of the auth user who owns seeded courses</td></tr>
-          <tr><td><code>OPENROUTER_API_KEY</code></td><td>Curriculum (selectable model, default <code>anthropic/claude-fable-5</code>), script trimming &amp; video prompts (<code>google/gemini-3.1-pro-preview</code>) + visual boards (<code>openai/gpt-5.4-image-2</code>)</td></tr>
+          <tr><td><code>OPENROUTER_API_KEY</code></td><td>Curriculum (selectable model or <code>openrouter/fusion</code> multi-model deliberation, default <code>anthropic/claude-fable-5</code>), script trimming &amp; video prompts (<code>google/gemini-3.1-pro-preview</code>) + visual boards (<code>openai/gpt-5.4-image-2</code>)</td></tr>
           <tr><td><code>REPLICATE_API_TOKEN</code></td><td>Kokoro-82M narration audio + Seedance 2.0 video generation</td></tr>
           <tr><td><code>R2_ENDPOINT_URL</code></td><td>Cloudflare R2 S3-compatible endpoint</td></tr>
           <tr><td><code>R2_ACCESS_KEY_ID</code></td><td>R2 access key</td></tr>
@@ -313,7 +313,7 @@
 
       <h3>Workflow</h3>
       <div class="cmd-list">
-        <div class="cmd"><code>1. New course</code><span>Enter a subject name (e.g. <code>ancient greece</code>), pick a curriculum model (Claude Fable / Opus 4.8 Fast / Sonnet 4.6 / GPT-5.5), and optionally a cover image URL.</span></div>
+        <div class="cmd"><code>1. New course</code><span>Enter a subject name (e.g. <code>ancient greece</code>), pick a curriculum model (Claude Fable / Opus 4.8 Fast / Sonnet 4.6 / Gemini 3.1 Pro / GPT-5.5 / OpenRouter Fusion), and optionally a cover image URL.</span></div>
         <div class="cmd"><code>2. Generate course</code><span>The chosen model builds a full curriculum JSON, saves it to Supabase, and opens the studio.</span></div>
         <div class="cmd"><code>3. Generate all</code><span>One button at the top fills in everything missing — cover, segment videos, captions, question videos — after a confirmation popup with a line-item cost breakdown (see below). The job runs server-side (<code>POST /api/generate-all</code>) and survives page reloads; the studio polls its progress and re-attaches on load. Or generate per card:</span></div>
         <div class="cmd"><code>3b. Generate video</code><span>Per script section — one button runs the full 5-stage pipeline (audio → board → prompt → video → captions, below).</span></div>
@@ -364,7 +364,7 @@
       <table>
         <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>POST /api/generate-curriculum</code></td><td>Body: <code>{ name, model? }</code>. Returns full curriculum JSON from the selected model (default <code>anthropic/claude-fable-5</code>).</td></tr>
+          <tr><td><code>POST /api/generate-curriculum</code></td><td>Body: <code>{ name, model? }</code>. Returns full curriculum JSON from the selected model (default <code>anthropic/claude-fable-5</code>). Pass <code>openrouter/fusion</code> to run every single-model option in parallel via the Fusion plugin, then synthesize the final JSON from a judge step — priced as the sum of all panel + judge calls.</td></tr>
           <tr><td><code>POST /api/courses</code></td><td>Create course with optional <code>curriculum</code> and <code>cover_image_url</code>.</td></tr>
           <tr><td><code>GET /api/courses/[id]</code></td><td>Load course; enriches curriculum with per-segment <code>video_url</code> + <code>captions</code>.</td></tr>
           <tr><td><code>PATCH /api/courses/[id]</code></td><td>Attach or replace curriculum and/or set <code>is_live</code> on an existing course.</td></tr>

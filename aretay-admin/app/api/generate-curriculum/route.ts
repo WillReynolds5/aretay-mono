@@ -3,7 +3,12 @@ import { OpenRouter } from "@openrouter/sdk";
 import { buildCurriculumPrompt, isValidCurriculum, parseCurriculumJson } from "@/lib/curriculum-prompt";
 import type { Curriculum } from "@/lib/curriculum";
 import { flattenScripts } from "@/lib/curriculum";
-import { DEFAULT_CURRICULUM_MODEL, isCurriculumModel } from "@/lib/curriculum-models";
+import {
+  CURRICULUM_MODELS,
+  DEFAULT_CURRICULUM_MODEL,
+  isCurriculumModel,
+  isFusionCurriculumModel,
+} from "@/lib/curriculum-models";
 
 export const maxDuration = 300;
 
@@ -50,7 +55,15 @@ export async function POST(req: NextRequest) {
         model,
         messages: [{ role: "user", content: prompt }],
         stream: false,
-        maxTokens: 65536,
+        maxTokens: 131072,
+        ...(isFusionCurriculumModel(model) && {
+          plugins: [
+            {
+              id: "fusion",
+              analysisModels: [...CURRICULUM_MODELS],
+            },
+          ],
+        }),
       },
     });
 

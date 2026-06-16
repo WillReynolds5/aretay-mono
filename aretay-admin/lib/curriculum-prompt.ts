@@ -81,6 +81,9 @@ When a story beat needs more room than one segment, split it across consecutive 
 ## Questions
 - **0-2 questions per segment, 4-6 per chapter.** A segment with zero questions is a continuation beat (use \`"questions": []\` — always an array, never null).
 - Only quiz facts the narration actually stated.
+- **Quiz the hard-to-recall fact; supply the easy context.** The answer should be the segment's most specific, effortful element — a name, number, date, or place — and the question stem should hand the learner the obvious surrounding context. Never invert this: if a date and a common noun appear together, the date is the answer, not the noun. (Wrong: "What did humans tame around 300,000 years ago?" → "Fire." Right: "Around when did humans tame fire?" → "300,000 years ago.")
+- **Don't let the stem give away its own answer.** If the question names the answer's category, the learner reconstructs instead of retrieves. (Wrong: "What role in the food chain did early humans play?" → "Scavengers.") Rephrase so the answer must be recalled, not inferred from the wording.
+- **Prefer answers with exactly one correct form** — a proper noun, named term, number, date, or place. Avoid quizzing soft descriptors ("weak scavengers", "very advanced") where many paraphrases would all be equally correct; those belong in continuation beats, not questions.
 - **Must be fully standalone.** A learner with zero context should answer them 3 weeks later.
 - NO pronouns ("he", "it", "they", "this", "that")
 - NO definite articles that assume context ("the war" → "the Peloponnesian War"; "the city" → "Athens")
@@ -222,6 +225,9 @@ The example below is deliberately MINIMAL — one act, one chapter — to show t
 | Too many questions | 3+ questions on one segment, or 8+ in a chapter | 0-2 per segment, 4-6 per chapter — pick the facts that matter |
 | Null questions | \`"questions": null\` on a continuation beat | Must be an empty array \`[]\` |
 | Quizzing the unsaid | Question about a date the narration never stated | Only quiz narrated facts |
+| Inverted retrieval | "What did humans tame around 300,000 years ago?" → "Fire." | Gives the hard fact (the date) for free, quizzes the obvious one — flip it so the answer is the effortful element |
+| Self-giving stem | "What role in the food chain did early humans play?" → "Scavengers." | The stem names the answer's category — learner reconstructs instead of recalling |
+| Soft-descriptor answer | "How did early humans survive?" → "Weak scavengers." | Many paraphrases are equally correct — ungradeable; make it a continuation beat instead |
 | Intro explains mechanics | "Each lesson is 15 seconds. Watch, then answer." | Intro is a hook, not a tutorial |
 | Intro contains branding | Ends on an app name or slogan | The intro is pure subject — branding lives elsewhere |
 | Intro is a summary | "This course covers the rise and fall of Greece." | A summary satisfies curiosity; a hook must starve it |
@@ -245,9 +251,10 @@ The example below is deliberately MINIMAL — one act, one chapter — to show t
 7. Strip-test: within each chapter, do the segments read as one continuous story?
 8. Does each chapter carry 4-6 questions, 0-2 per segment, all testing facts the narration actually stated?
 9. Are all questions standalone (no pronouns, no context-dependent "the X")?
-10. Are all answers ≤3 words AND a single concept?
-11. Is there roughly one callback per chapter resurfacing an earlier fact?
-12. Are there 1-${MAX_COURSE_TAGS} tags, all from the fixed vocabulary, most relevant first?
+10. For each question, is the answer the segment's hardest-to-recall element (name, number, date, place) rather than an obvious noun the stem already implies — and does the stem avoid naming the answer's category?
+11. Are all answers ≤3 words AND a single concept?
+12. Is there roughly one callback per chapter resurfacing an earlier fact?
+13. Are there 1-${MAX_COURSE_TAGS} tags, all from the fixed vocabulary, most relevant first?
 
 # INPUT
 

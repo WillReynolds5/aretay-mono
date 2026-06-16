@@ -6,7 +6,12 @@ import { useRouter } from "next/navigation";
 import type { Curriculum } from "@/lib/curriculum";
 import { flattenScripts } from "@/lib/curriculum";
 import type { CurriculumModel } from "@/lib/curriculum-models";
-import { CURRICULUM_MODELS, DEFAULT_CURRICULUM_MODEL } from "@/lib/curriculum-models";
+import {
+  CURRICULUM_MODEL_LABELS,
+  CURRICULUM_MODEL_OPTIONS,
+  DEFAULT_CURRICULUM_MODEL,
+  isFusionCurriculumModel,
+} from "@/lib/curriculum-models";
 
 const inputStyle = {
   background: "var(--background)",
@@ -119,10 +124,15 @@ export default function NewCoursePage() {
                 className="w-full rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1"
                 style={inputStyle}
               >
-                {CURRICULUM_MODELS.map(m => (
-                  <option key={m} value={m}>{m}</option>
+                {CURRICULUM_MODEL_OPTIONS.map(m => (
+                  <option key={m} value={m}>{CURRICULUM_MODEL_LABELS[m]}</option>
                 ))}
               </select>
+              {isFusionCurriculumModel(model) && (
+                <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
+                  Runs every single-model option in parallel, then a judge synthesizes the final curriculum. Priced as the sum of all panel + judge calls — slower and more expensive, but higher quality.
+                </p>
+              )}
             </div>
 
             <div>
@@ -188,7 +198,7 @@ export default function NewCoursePage() {
 
           {generating && (
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              Calling {model}, then saving — this may take a minute…
+              Calling {CURRICULUM_MODEL_LABELS[model]}, then saving — this may take a few minutes…
             </p>
           )}
         </div>
