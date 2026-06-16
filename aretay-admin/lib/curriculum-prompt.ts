@@ -83,14 +83,13 @@ When a story beat needs more room than one segment, split it across consecutive 
 - Only quiz facts the narration actually stated.
 - **Quiz the hard-to-recall fact; supply the easy context.** The answer should be the segment's most specific, effortful element — a name, number, date, or place — and the question stem should hand the learner the obvious surrounding context. Never invert this: if a date and a common noun appear together, the date is the answer, not the noun. (Wrong: "What did humans tame around 300,000 years ago?" → "Fire." Right: "Around when did humans tame fire?" → "300,000 years ago.")
 - **Don't let the stem give away its own answer.** If the question names the answer's category, the learner reconstructs instead of retrieves. (Wrong: "What role in the food chain did early humans play?" → "Scavengers.") Rephrase so the answer must be recalled, not inferred from the wording.
-- **Prefer answers with exactly one correct form** — a proper noun, named term, number, date, or place. Avoid quizzing soft descriptors ("weak scavengers", "very advanced") where many paraphrases would all be equally correct; those belong in continuation beats, not questions.
+- **Atomic: one fact, one canonical answer.** Each question targets a single fact worth recalling in 3 weeks, and its answer has exactly ONE written form — a name, number, date, or place. If the only natural answer is a soft descriptor that many paraphrases satisfy ("the middle", "weak scavengers"), either re-aim the question at a named or numeric fact in the same segment, or leave the segment a continuation beat. A gradeable answer can't have synonyms.
 - **Must be fully standalone.** A learner with zero context should answer them 3 weeks later.
 - NO pronouns ("he", "it", "they", "this", "that")
 - NO definite articles that assume context ("the war" → "the Peloponnesian War"; "the city" → "Athens")
 - Include time, place, and proper-noun anchors
 - Mental test: *Could this question be emailed to a stranger and answered correctly?*
 - Vary types across a chapter: when / where / who / what / why / how
-- Each question tests ONE atomic fact — the ones worth remembering in 3 weeks
 
 ## Answers
 - **3 words maximum**
@@ -252,7 +251,7 @@ The example below is deliberately MINIMAL — one act, one chapter — to show t
 8. Does each chapter carry 4-6 questions, 0-2 per segment, all testing facts the narration actually stated?
 9. Are all questions standalone (no pronouns, no context-dependent "the X")?
 10. For each question, is the answer the segment's hardest-to-recall element (name, number, date, place) rather than an obvious noun the stem already implies — and does the stem avoid naming the answer's category?
-11. Are all answers ≤3 words AND a single concept?
+11. Is every answer ≤3 words, a single concept, AND a single canonical form with no equally-correct synonyms?
 12. Is there roughly one callback per chapter resurfacing an earlier fact?
 13. Are there 1-${MAX_COURSE_TAGS} tags, all from the fixed vocabulary, most relevant first?
 
