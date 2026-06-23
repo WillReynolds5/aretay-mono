@@ -194,7 +194,7 @@
       <p style="margin-bottom:8px">Copy <code>Config/Secrets.example.xcconfig</code> → <code>Config/Secrets.xcconfig</code> and fill in:</p>
       <div class="cmd-list">
         <div class="cmd"><code>SUPABASE_URL</code><span>local: <code>http:/$()/127.0.0.1:54321</code> · prod: from Supabase dashboard</span></div>
-        <div class="cmd"><code>SUPABASE_ANON_KEY</code><span>from <code>./run-backend.sh keys</code> or Supabase dashboard</span></div>
+        <div class="cmd"><code>SUPABASE_ANON_KEY</code><span>from <code>./aretay-backend/run-backend.sh keys</code> or Supabase dashboard</span></div>
         <div class="cmd"><code>R2_PUBLIC_BASE_URL</code><span>public base for media (bucket's r2.dev public URL or CDN domain) — <code>cards.video_r2_key</code> is appended to it</span></div>
       </div>
 
@@ -230,11 +230,11 @@
 
       <h3>Run locally</h3>
       <div class="cmd-list">
-        <div class="cmd"><code>./run-backend.sh start</code><span>boots local Supabase stack in Docker</span></div>
-        <div class="cmd"><code>./run-backend.sh keys</code><span>prints SUPABASE_URL + ANON_KEY for Secrets.xcconfig</span></div>
-        <div class="cmd"><code>./run-backend.sh new &lt;name&gt;</code><span>creates a new timestamped migration file</span></div>
-        <div class="cmd"><code>./run-backend.sh push</code><span>pushes local migrations to linked prod project</span></div>
-        <div class="cmd"><code>./run-backend.sh stop</code><span>shuts down local stack</span></div>
+        <div class="cmd"><code>./aretay-backend/run-backend.sh start</code><span>boots local Supabase stack in Docker</span></div>
+        <div class="cmd"><code>./aretay-backend/run-backend.sh keys</code><span>prints SUPABASE_URL + ANON_KEY for Secrets.xcconfig</span></div>
+        <div class="cmd"><code>./aretay-backend/run-backend.sh new &lt;name&gt;</code><span>creates a new timestamped migration file</span></div>
+        <div class="cmd"><code>./aretay-backend/run-backend.sh push</code><span>pushes local migrations to linked prod project</span></div>
+        <div class="cmd"><code>./aretay-backend/run-backend.sh stop</code><span>shuts down local stack</span></div>
       </div>
 
       <h3>Local service URLs</h3>
@@ -288,7 +288,7 @@
 
       <h3>Run locally</h3>
       <div class="cmd-list">
-        <div class="cmd"><code>./run-admin.sh</code><span>installs deps if needed, starts Next.js at <code>localhost:3001</code></span></div>
+        <div class="cmd"><code>./aretay-admin/run-admin.sh</code><span>installs deps if needed, starts Next.js at <code>localhost:3001</code></span></div>
         <div class="cmd"><code>npm run studio --prefix aretay-admin</code><span>opens Remotion Studio for composition dev</span></div>
         <div class="cmd"><code>npm run experiment -- &lt;courseId&gt; &lt;segKey&gt;</code><span>Seedance flag experiment — measures what triggers E005 for a segment's inputs</span></div>
       </div>
