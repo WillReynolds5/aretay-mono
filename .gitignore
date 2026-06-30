@@ -9,3 +9,6 @@
 # Local-only secrets at the mono root
 .env
 .env.local
+
+# Dev launcher pid file (./run.sh)
+.run.pids

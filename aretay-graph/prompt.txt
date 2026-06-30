@@ -1,0 +1,54 @@
+# Anki Deck → Semantic Tree (JSON)
+
+## Overview
+You convert a flat Anki deck (TXT export, one card per line) into a **semantic tree** built from two node kinds: **topics** (concepts that organize) and **questions** (atomic facts a learner is tested on). Every deck card becomes a **question**. You group questions under **topics** by meaning, inferring structure the deck doesn't state, and you create new topics — and, when useful, new questions — wherever they aid learning. Output **JSON only**.
+
+## Node kinds
+- **Question** — one atomic fact: `{ "kind": "question", "q", "a", "fromDeck": true|false }`. Questions are leaves. `fromDeck: true` maps to a real deck card; `fromDeck: false` is one you invented to make a topic learnable.
+- **Topic** — a concept that organizes: `{ "kind": "topic", "name", "count", "children": [...] }`. Topics need not be quizzable themselves; a topic may exist purely for organization (e.g. "Countries"). When a topic carries a learnable fact, attach it as a **question** child of that topic (e.g. a "What is this continent? → Europe" question hanging off the "Europe" topic) rather than on the topic itself.
+- `count` = number of descendant questions; add it to every topic.
+
+## Rules
+1. **Lossless** — every input card becomes exactly one question with `fromDeck: true`; never drop or merge cards.
+2. **Coarse → fine** — top topics are the broadest meaningful axis; nest topics within topics before reaching questions.
+3. **Add questions only when they help** — a topic does not need a question; invent one (`fromDeck: false`) only when a high-level fact aids learning and the deck lacks it (e.g. add "Which continent is this? → Europe" for a deck of "What country is this?" cards). Purely organizational topics (e.g. "Countries") carry no question.
+4. **Order for learning** — within a topic, list its own questions before its sub-topics, most general first, so the learner masters the high-level fact (e.g. "Which continent is this? → Europe") before the specific ones (e.g. "What country is this? → France").
+5. **Balance depth** — avoid single-child chains and flat dumps; group when a tier exceeds ~12 children.
+
+## Example
+Input (TXT):
+```
+France	Capital	Paris
+Japan	Capital	Tokyo
+Pacific Ocean	Location
+```
+Output (JSON):
+```json
+{
+  "kind": "topic", "name": "Geography", "count": 5,
+  "children": [
+    { "kind": "topic", "name": "Europe", "count": 2, "children": [
+      { "kind": "question", "q": "What continent is this?", "a": "Europe", "fromDeck": false },
+      { "kind": "topic", "name": "Countries", "count": 1, "children": [
+        { "kind": "question", "q": "What is the capital of France?", "a": "Paris", "fromDeck": true }
+      ]}
+    ]},
+    { "kind": "topic", "name": "Asia", "count": 2, "children": [
+      { "kind": "question", "q": "What continent is this?", "a": "Asia", "fromDeck": false },
+      { "kind": "topic", "name": "Countries", "count": 1, "children": [
+        { "kind": "question", "q": "What is the capital of Japan?", "a": "Tokyo", "fromDeck": true }
+      ]}
+    ]},
+    { "kind": "topic", "name": "Bodies of Water", "count": 1, "children": [
+      { "kind": "question", "q": "Where is the Pacific Ocean?", "a": "Between Asia/Australia and the Americas", "fromDeck": true }
+    ]}
+  ]
+}
+```
+
+## Task
+Given the deck below, return the complete semantic-tree JSON. No prose, no code fences.
+
+```
+{{ANKI_TXT}}
+```
