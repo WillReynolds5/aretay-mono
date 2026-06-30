@@ -1,6 +1,6 @@
 [submodule "aretay-ios"]
 	path = aretay-ios
 	url = https://github.com/WillReynolds5/aretay-ios.git
-[submodule "aretay-backend"]
-	path = aretay-backend
-	url = https://github.com/WillReynolds5/aretay-backend.git
+[submodule "aretay-web"]
+	path = aretay-web
+	url = https://github.com/WillReynolds5/aretay-web.git

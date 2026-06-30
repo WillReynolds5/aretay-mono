@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Aretay monorepo dev launcher — starts backend + admin together.
+# Aretay monorepo dev launcher — starts local Supabase + admin together.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -28,7 +28,7 @@ ${B}Services:${N}
   Admin console      http://localhost:3001
 
 ${D}iOS: open aretay-ios/Aretay.xcodeproj in Xcode and press ⌘R.
-     aretay-web is static HTML — no local server needed.${N}
+     Admin + local Supabase live under aretay-web/.${N}
 EOF
 }
 
@@ -63,10 +63,10 @@ cmd_start() {
   trap cleanup INT TERM EXIT
 
   printf "${B}→${N} Starting backend…\n"
-  "$ROOT/aretay-backend/run-backend.sh" start
+  "$ROOT/aretay-web/run-backend.sh" start
 
   printf "\n${B}→${N} Starting admin…\n"
-  "$ROOT/aretay-admin/run-admin.sh" &
+  "$ROOT/aretay-web/run-admin.sh" &
   ADMIN_PID=$!
   save_pids
 
@@ -82,22 +82,22 @@ cmd_start() {
 cmd_stop() {
   stop_saved_pids
   printf "${B}→${N} Stopping backend…\n"
-  "$ROOT/aretay-backend/run-backend.sh" stop
+  "$ROOT/aretay-web/run-backend.sh" stop
   printf "${G}✔${N} All services stopped.\n"
 }
 
 cmd_keys() {
-  "$ROOT/aretay-backend/run-backend.sh" keys
+  "$ROOT/aretay-web/run-backend.sh" keys
 }
 
 cmd_voice() {
   trap cleanup INT TERM EXIT
 
   printf "${B}→${N} Starting voice review dev loop…\n"
-  "$ROOT/aretay-backend/run-backend.sh" start
+  "$ROOT/aretay-web/run-backend.sh" start
 
   printf "\n${B}→${N} Serving Edge Functions…\n"
-  "$ROOT/aretay-backend/run-backend.sh" serve-functions &
+  "$ROOT/aretay-web/run-backend.sh" serve-functions &
   FUNCTIONS_PID=$!
   save_pids
 

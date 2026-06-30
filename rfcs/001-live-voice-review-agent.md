@@ -28,7 +28,7 @@ cheap image (~$0.067 each).
 
 ## 2. Background — how review works today
 
-(See `readme.html` for the full picture; summarized here for grounding.)
+Current behavior summarized here for grounding.
 
 - A **session** is a TikTok-style vertical feed (`SessionView` / `SessionFeedView`).
   Each queue item is a full-screen page: a **segment video**, a **question page**,

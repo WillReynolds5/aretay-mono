@@ -1,11 +1,11 @@
 # Aretay Mono
 
-Umbrella repo that pins the iOS app and backend at specific commits via git submodules.
+Umbrella repo for the iOS app and the unified web/admin + Supabase workspace.
 
 ```
 aretay-mono/
 ├── aretay-ios/        → github.com/WillReynolds5/aretay-ios
-└── aretay-backend/    → github.com/WillReynolds5/aretay-backend
+└── aretay-web/        → Next admin, marketing pages, Supabase migrations/functions
 ```
 
 ## Clone
@@ -20,11 +20,10 @@ If you already cloned without `--recurse-submodules`:
 git submodule update --init --recursive
 ```
 
-## Working with submodules
+## Working with the iOS submodule
 
-Each subfolder is its **own independent git repo** with its own remote. The mono
-repo only stores a **pointer to a specific commit** in each submodule — it does
-not store the submodule's files directly.
+`aretay-ios` is still its own independent git repo. The mono repo stores a
+pointer to a specific iOS commit.
 
 ### Make changes inside a submodule
 
@@ -45,7 +44,7 @@ git commit -m "Bump aretay-ios to latest"
 git push
 ```
 
-### Pull the latest of all submodules
+### Pull the latest iOS submodule
 
 ```bash
 git submodule update --remote --merge
@@ -53,4 +52,6 @@ git submodule update --remote --merge
 
 ## Backend stack
 
-Backend is being scaffolded with **Supabase** (see `aretay-backend/supabase/`).
+Supabase migrations and Edge Functions live in `aretay-web/supabase/`.
+Use `aretay-web/run-backend.sh` directly, or root `./run.sh` for the local
+admin + Supabase dev stack.
